@@ -1,0 +1,49 @@
+{
+  "name": "blank-metal-nextjs",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/nix:1": {
+      "extraNixConfig": "experimental-features = nix-command flakes"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.formatOnSave": true,
+        // Include extra files (js) to show pretty colorize colors
+        "colorize.include": [
+          "**/*.js",
+          "**/*.ts",
+          "**/*.tsx",
+          "**/*.css",
+          "**/*.scss",
+          "**/*.sass",
+          "**/*.less",
+          "**/*.styl"
+        ],
+      },
+      "extensions": [
+        "mkhl.direnv",
+        "eamodio.gitlens",
+        "orta.vscode-jest",
+        "kamikillerto.vscode-colorize",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "GitHub.vscode-pull-request-github"
+      ]
+    }
+  },
+  "appPort": [
+    "4352:3000",
+    "4353:3001"
+  ],
+  "runArgs": [
+    "--name",
+    "blank-metal-nextjs_devcontainer"
+  ],
+  "postCreateCommand": "direnv allow . && nix develop --command bash /tmp/post-install-setup.sh",
+  "remoteUser": "vscode"
+}
