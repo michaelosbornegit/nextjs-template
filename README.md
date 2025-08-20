@@ -1,5 +1,5 @@
 ## This repo was bootstrapped with create-next-app with the following initial options
-```
+\`\`\`
 ✔ What is your project named? … blank-metal-nextjs-boilerplate
 ✔ Would you like to use TypeScript? … No / Yes
 ✔ Would you like to use ESLint? … No / Yes
@@ -8,7 +8,7 @@
 ✔ Would you like to use App Router? (recommended) … No / Yes
 ✔ Would you like to use Turbopack for `next dev`? … No / Yes
 ✔ Would you like to customize the import alias (`@/*` by default)? … No / Yes
-```
+\`\`\`
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ You can then cmd + shift + p and type in "Dev Containers: Reopen in Container" t
 
 First, run the development server:
 
-```bash
+\`\`\`bash
 npm run dev
 # or
 yarn dev
@@ -30,7 +30,7 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
+\`\`\`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
