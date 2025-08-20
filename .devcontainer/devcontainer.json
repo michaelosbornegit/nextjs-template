@@ -13,7 +13,6 @@
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",
         "editor.formatOnSave": true,
-        // Include extra files (js) to show pretty colorize colors
         "colorize.include": [
           "**/*.js",
           "**/*.ts",
@@ -23,7 +22,7 @@
           "**/*.sass",
           "**/*.less",
           "**/*.styl"
-        ],
+        ]
       },
       "extensions": [
         "mkhl.direnv",
@@ -36,14 +35,8 @@
       ]
     }
   },
-  "appPort": [
-    "4352:3000",
-    "4353:3001"
-  ],
-  "runArgs": [
-    "--name",
-    "blank-metal-nextjs_devcontainer"
-  ],
+  "appPort": ["4352:3000", "4353:3001"],
+  "runArgs": ["--name", "blank-metal-nextjs_devcontainer"],
   "postCreateCommand": "direnv allow . && nix develop --command bash /tmp/post-install-setup.sh",
   "remoteUser": "vscode"
 }

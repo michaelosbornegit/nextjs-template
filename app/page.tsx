@@ -1,103 +1,217 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { Trash2, Edit3, Save, X } from "lucide-react"
+
+interface Note {
+  id: string
+  title: string
+  content: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export default function NotesApp() {
+  const [notes, setNotes] = useState<Note[]>([])
+  const [newTitle, setNewTitle] = useState("")
+  const [newContent, setNewContent] = useState("")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState("")
+  const [editContent, setEditContent] = useState("")
+
+  // Load notes from localStorage on component mount
+  useEffect(() => {
+    const savedNotes = localStorage.getItem("notes")
+    if (savedNotes) {
+      const parsedNotes = JSON.parse(savedNotes).map((note: any) => ({
+        ...note,
+        createdAt: new Date(note.createdAt),
+        updatedAt: new Date(note.updatedAt),
+      }))
+      setNotes(parsedNotes)
+    }
+  }, [])
+
+  // Save notes to localStorage whenever notes change
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes))
+  }, [notes])
+
+  const addNote = () => {
+    if (newTitle.trim() || newContent.trim()) {
+      const note: Note = {
+        id: Date.now().toString(),
+        title: newTitle.trim() || "Untitled",
+        content: newContent.trim(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+      setNotes([note, ...notes])
+      setNewTitle("")
+      setNewContent("")
+    }
+  }
+
+  const deleteNote = (id: string) => {
+    setNotes(notes.filter((note) => note.id !== id))
+  }
+
+  const startEditing = (note: Note) => {
+    setEditingId(note.id)
+    setEditTitle(note.title)
+    setEditContent(note.content)
+  }
+
+  const saveEdit = () => {
+    if (editingId) {
+      setNotes(
+        notes.map((note) =>
+          note.id === editingId
+            ? { ...note, title: editTitle.trim() || "Untitled", content: editContent.trim(), updatedAt: new Date() }
+            : note,
+        ),
+      )
+      setEditingId(null)
+      setEditTitle("")
+      setEditContent("")
+    }
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditTitle("")
+    setEditContent("")
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">My Notes</h1>
+          <p className="text-muted-foreground">Capture your thoughts and ideas</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Add new note form */}
+        <Card className="mb-8">
+          <CardHeader>
+            <h2 className="text-lg font-semibold">Add New Note</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Note title..."
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              className="w-full"
+            />
+            <Textarea
+              placeholder="Write your note here..."
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+              className="w-full min-h-[100px] resize-none"
+            />
+            <Button onClick={addNote} className="w-full sm:w-auto">
+              Add Note
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Notes list */}
+        <div className="space-y-4">
+          {notes.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-muted-foreground text-lg">No notes yet. Create your first note above!</p>
+              </CardContent>
+            </Card>
+          ) : (
+            notes.map((note) => (
+              <Card key={note.id} className="transition-shadow hover:shadow-md">
+                <CardContent className="p-6">
+                  {editingId === note.id ? (
+                    // Edit mode
+                    <div className="space-y-4">
+                      <Input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="font-semibold text-lg"
+                      />
+                      <Textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="min-h-[100px] resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <Button onClick={saveEdit} size="sm" className="flex items-center gap-2">
+                          <Save className="w-4 h-4" />
+                          Save
+                        </Button>
+                        <Button
+                          onClick={cancelEdit}
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-2 bg-transparent"
+                        >
+                          <X className="w-4 h-4" />
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    // View mode
+                    <div>
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="font-semibold text-lg text-foreground">{note.title}</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => startEditing(note)}
+                            variant="ghost"
+                            size="sm"
+                            className="flex items-center gap-2"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => deleteNote(note.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="flex items-center gap-2 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                      {note.content && <p className="text-foreground whitespace-pre-wrap mb-3">{note.content}</p>}
+                      <div className="text-sm text-muted-foreground">
+                        Created: {formatDate(note.createdAt)}
+                        {note.updatedAt.getTime() !== note.createdAt.getTime() && (
+                          <span className="ml-4">Updated: {formatDate(note.updatedAt)}</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
     </div>
-  );
+  )
 }
